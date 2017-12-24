@@ -6,8 +6,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC
 
 import matplotlib.pyplot as plt
+from time import time
 
 def main(mnist):
+    """Compares efficiency (time and accuracy) of SVM on MNIST using PCA
+    """
 
     nb_components = 50
 
@@ -21,15 +24,24 @@ def main(mnist):
     X_test  = scaler.transform(X_test)
 
     # Training on raw data
-    print("\nTraining on raw data...")
+    print("\n- Training on raw data...")
+    time_start = time() 
+
     clf = LinearSVC()
     clf.fit(X_train, y_train)
-    print("Scoring on raw data...")
-    score = clf.score(X_test, y_test)
 
+    # Computing the time
+    time_finish = time()
+    time_train  = time_finish - time_start
+    minutes = time_train // 60
+    seconds = time_train % 60
+    print("- Trained in", minutes, "min and", seconds, "seconds")
+
+    print("- Scoring on raw data...")
+    score = clf.score(X_test, y_test)
     print("[!] Prediction on raw data:", score)
 
-    for nb_components in [1, 50, 100, 150, 200, 250, 300]:
+    for nb_components in range(1, 402, 25):
 
         print("\nNumber of components:", nb_components)
         # Dimension reduction
@@ -41,10 +53,20 @@ def main(mnist):
         X_test_transform = pca.transform(X_test)
 
         # Training on the pca data
-        print("Training on PCA data...")
+        print("- Training on PCA data...")
+        time_start = time() 
+
         clf2 = LinearSVC()
         clf2.fit(X_train_transform, y_train)
-        print("Scoring on PCA data...")
+
+        # Computing the time
+        time_finish = time()
+        time_train  = time_finish - time_start
+        minutes = time_train // 60
+        seconds = time_train % 60
+        print("- Trained in", minutes, "min and", seconds, "seconds")
+
+        print("- Scoring on PCA data...")
         score_pca = clf2.score(X_test_transform, y_test)
 
         print("[!] Prediction on PCA data:", score_pca)
